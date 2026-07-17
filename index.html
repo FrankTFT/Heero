@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Heero — Roadmap</title>
+<style>
+:root{
+  --bg:#121723;
+  --border:#2a2f39;
+  --text:#f4f5f6;
+  --muted:#919aa6;
+  --accent:#88bdfd;
+  --accent-bg:#1c3354;
+  --accent-border:#2c4a78;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;}
+.wrap{max-width:700px;margin:0 auto;padding:48px 20px 100px;}
+.hidden{display:none !important;}
+
+.eyebrow{font-size:11px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;font-weight:600;}
+h1.title{font-size:32px;font-weight:700;margin:10px 0 6px;letter-spacing:-0.3px;}
+.subtitle{color:var(--muted);font-size:15px;margin:0 0 26px;}
+
+.progress-row{display:flex;align-items:center;gap:14px;margin-bottom:36px;}
+.progress-track{flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);width:0%;border-radius:4px;transition:width .3s ease;}
+.progress-pct{font-size:13px;color:var(--muted);flex:none;min-width:36px;text-align:right;}
+
+/* Overview list */
+.timeline{position:relative;}
+.phase-row{display:flex;gap:16px;position:relative;}
+.badge-col{display:flex;flex-direction:column;align-items:center;flex:none;width:36px;}
+.badge{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);
+  background:var(--bg);flex:none;z-index:1;
+}
+.badge.active{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);}
+.badge-line{flex:1;width:1px;background:var(--border);margin:2px 0;}
+.phase-card{
+  flex:1;border:1px solid var(--border);border-radius:10px;padding:18px 20px;
+  margin-bottom:20px;cursor:pointer;text-decoration:none;color:inherit;display:block;
+}
+.phase-card:hover{border-color:#3a4152;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.card-title{font-size:16px;font-weight:600;color:var(--text);}
+.card-frac{font-size:13px;color:var(--muted);white-space:nowrap;}
+.card-goal{font-style:italic;color:var(--muted);font-size:13.5px;margin:4px 0 12px;}
+.card-progress{height:4px;background:var(--border);border-radius:3px;overflow:hidden;}
+.card-progress-fill{height:100%;background:var(--accent);border-radius:3px;}
+
+/* Detail view */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);
+  border-radius:20px;padding:7px 16px;font-size:13px;color:var(--muted);
+  background:transparent;cursor:pointer;margin-bottom:28px;text-decoration:none;
+}
+.back-btn:hover{color:var(--text);border-color:#3a4152;}
+.phase-label{font-size:11px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;font-weight:600;}
+h2.detail-title{font-size:28px;font-weight:700;margin:10px 0 6px;}
+.detail-goal{font-style:italic;color:var(--muted);font-size:14.5px;margin:0 0 20px;}
+
+.note-box{
+  background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;
+  padding:16px 18px;margin-bottom:28px;
+}
+.note-box .note-label{
+  font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;
+  display:block;margin-bottom:6px;
+}
+.note-box .note-text{color:var(--accent);font-size:14px;line-height:1.6;opacity:.92;}
+
+.section{margin-top:30px;}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-label-wrap{display:flex;align-items:center;gap:8px;}
+.section-bar{width:3px;height:14px;background:var(--accent);border-radius:2px;}
+.section-label{font-size:11.5px;font-weight:700;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;}
+.mark-all{
+  border:1px solid var(--border);border-radius:16px;padding:5px 12px;font-size:11.5px;
+  color:var(--muted);background:transparent;cursor:pointer;
+}
+.mark-all:hover{color:var(--text);border-color:#3a4152;}
+
+ul.item-list{list-style:none;margin:0;padding:0;}
+ul.item-list li{
+  border:1px solid var(--border);border-radius:8px;padding:13px 16px;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+}
+ul.item-list li input[type=checkbox]{
+  width:17px;height:17px;accent-color:var(--accent);flex:none;cursor:pointer;
+}
+ul.item-list li label{font-size:14px;color:var(--text);cursor:pointer;flex:1;}
+ul.item-list li.done label{color:var(--muted);text-decoration:line-through;}
+
+.reset-link{
+  display:inline-block;margin-top:36px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted);cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="app"></div></div>
+<script>
+const STORE_KEY = 'roadmap-progress-heero';
+const ROADMAP = {"title": "Heero", "subtitleShort": "Build a working model of how money, banks, and markets actually operate.", "phases": [{"num": "01", "title": "Understand the Financial System", "goal": "Build a mental model of the entire economy.", "study_heading": "STUDY", "study": ["What money actually is", "Commercial banks", "Central banks", "Interest rates", "Inflation", "Government debt", "Bonds", "Equity markets", "Foreign exchange", "Payments", "Credit", "Financial crises"], "ask_heading": "QUESTIONS YOU SHOULD BE ABLE TO ANSWER", "ask": ["Why do banks exist?", "Where does money come from?", "Why do central banks raise rates?", "Why does inflation happen?", "How do recessions begin?", "How do governments finance themselves?", "Why do bond yields matter?", "Why are banks regulated?"], "note": null}, {"num": "02", "title": "Banking Deep Dive", "goal": "Focus only on banks.", "study_heading": "STUDY", "study": ["Retail banking", "Commercial banking", "Investment banking", "Wealth management", "Private banking", "Treasury operations", "Core banking systems", "Payment rails", "SWIFT", "Visa", "Mastercard", "Clearing", "Settlement", "Liquidity", "Capital requirements", "Basel III", "Risk management", "AML / KYC", "Fraud prevention"], "ask_heading": "QUESTIONS", "ask": ["How does a bank actually make money?", "Why are transfers slow?", "What happens when you send money?", "What software runs banks?", "Why is banking software so old?", "Why are regulators involved in everything?"], "note": null}, {"num": "03", "title": "Financial Markets", "goal": "Understand where capital comes from.", "study_heading": "STUDY", "study": ["Stocks", "Bonds", "ETFs", "Mutual funds", "Commodities", "Futures", "Options", "Derivatives", "Market makers", "Exchanges", "Clearing houses", "Hedge funds", "Asset managers"], "ask_heading": "QUESTIONS", "ask": ["Why do markets exist?", "What creates liquidity?", "Why do prices move?", "What is market efficiency?", "What role do banks play?"], "note": null}, {"num": "04", "title": "Corporate Finance", "goal": "Understand how businesses think.", "study_heading": "STUDY", "study": ["Financial statements", "Cash flow", "Debt", "Equity", "Cost of capital", "Valuation", "Capital allocation", "Mergers &amp; acquisitions"], "ask_heading": "QUESTIONS", "ask": ["Why do companies borrow?", "Why issue shares?", "Why do companies fail?", "What decisions create value?"], "note": null}, {"num": "05", "title": "Fintech Landscape", "goal": "Begin studying fintech companies, only now.", "study_heading": "STUDY", "study": ["Digital banks", "Payments", "Lending", "Personal finance", "Accounting", "Treasury", "Wealth management", "Banking infrastructure", "Compliance", "Identity", "Fraud", "Embedded finance", "B2B fintech", "Crypto infrastructure (understand, not necessarily build)"], "ask_heading": "FOR EVERY COMPANY, ASK", "ask": ["What problem existed?", "Why couldn't banks solve it?", "What regulation enabled it?", "How do they make money?", "What moat do they have?"], "note": null}, {"num": "06", "title": "Banking Technology", "goal": "Put your software background to work.", "study_heading": "STUDY", "study": ["Core banking systems", "APIs", "Open Banking", "ISO 20022", "Payment gateways", "Event-driven architecture", "Distributed systems", "Databases", "Identity", "Authentication", "Encryption", "Digital signatures", "Cloud infrastructure", "High availability", "Disaster recovery"], "ask_heading": null, "ask": [], "note": "This is where your engineering background stops being background and starts being leverage."}, {"num": "07", "title": "Regulation", "goal": "Learn how regulation shapes the product as much as engineering does.", "study_heading": "LEARN", "study": ["Banking licences", "Payment licences", "Consumer protection", "Privacy", "AML", "KYC", "Sanctions", "PCI DSS", "Data security"], "ask_heading": null, "ask": [], "note": "Every fintech founder eventually discovers this the hard way. Learn it first."}, {"num": "08", "title": "Find Problems", "goal": "This phase never ends.", "study_heading": "READ", "study": ["Annual reports from major banks", "Regulatory consultation papers", "Fintech news", "Engineering blogs", "Developer documentation", "Customer complaints", "Banking forums", "Industry reports"], "ask_heading": null, "ask": [], "note": "There is no capstone here. The output of this phase is a problem worth building the next seven phases in service of."}]};
+
+function loadState(){ try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch(e){ return {}; } }
+function saveState(s){ localStorage.setItem(STORE_KEY, JSON.stringify(s)); }
+
+function allItemIds(phase){
+  const ids = [];
+  phase.study.forEach((_, i) => ids.push('p'+phase.num+'-study-'+i));
+  (phase.ask||[]).forEach((_, i) => ids.push('p'+phase.num+'-ask-'+i));
+  return ids;
+}
+
+function phaseCounts(phase, state){
+  const ids = allItemIds(phase);
+  const done = ids.filter(id => state[id]).length;
+  return {done, total: ids.length};
+}
+
+function renderOverview(){
+  const state = loadState();
+  let totalDone = 0, totalAll = 0;
+  const rows = ROADMAP.phases.map((p, idx) => {
+    const {done, total} = phaseCounts(p, state);
+    totalDone += done; totalAll += total;
+    const pct = total ? Math.round((done/total)*100) : 0;
+    const isLast = idx === ROADMAP.phases.length - 1;
+    const activeClass = (done > 0 && done < total) ? 'active' : '';
+    return `
+      <div class="phase-row">
+        <div class="badge-col">
+          <div class="badge ${activeClass}">${idx+1}</div>
+          ${isLast ? '' : '<div class="badge-line"></div>'}
+        </div>
+        <a class="phase-card" href="#/phase/${p.num}">
+          <div class="card-top">
+            <div class="card-title">${p.title}</div>
+            <div class="card-frac">${done}/${total} &rsaquo;</div>
+          </div>
+          <div class="card-goal">${p.goal}</div>
+          <div class="card-progress"><div class="card-progress-fill" style="width:${pct}%"></div></div>
+        </a>
+      </div>
+    `;
+  }).join('');
+  const overallPct = totalAll ? Math.round((totalDone/totalAll)*100) : 0;
+  document.getElementById('app').innerHTML = `
+    <div class="eyebrow">Roadmap</div>
+    <h1 class="title">${ROADMAP.title}</h1>
+    <div class="subtitle">${ROADMAP.subtitleShort}</div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" style="width:${overallPct}%"></div></div>
+      <div class="progress-pct">${overallPct}%</div>
+    </div>
+    <div class="timeline">${rows}</div>
+  `;
+}
+
+function renderItemList(phase, key, items, state){
+  if (!items || !items.length) return '';
+  const heading = key === 'study' ? phase.study_heading : (phase.ask_heading || 'QUESTIONS');
+  const lis = items.map((text, i) => {
+    const id = 'p'+phase.num+'-'+key+'-'+i;
+    const checked = !!state[id];
+    return `<li class="${checked?'done':''}">
+      <input type="checkbox" id="${id}" data-id="${id}" ${checked?'checked':''}/>
+      <label for="${id}">${text}</label>
+    </li>`;
+  }).join('');
+  return `
+    <div class="section" data-section="${key}">
+      <div class="section-head">
+        <div class="section-label-wrap">
+          <div class="section-bar"></div>
+          <div class="section-label">${heading}</div>
+        </div>
+        <button class="mark-all" data-mark="${phase.num}:${key}">Mark all</button>
+      </div>
+      <ul class="item-list">${lis}</ul>
+    </div>
+  `;
+}
+
+function renderPhase(num){
+  const phase = ROADMAP.phases.find(p => p.num === num);
+  if (!phase) { location.hash = '#/'; return; }
+  const state = loadState();
+  const {done, total} = phaseCounts(phase, state);
+  const pct = total ? Math.round((done/total)*100) : 0;
+  const note = phase.note ? `
+    <div class="note-box">
+      <span class="note-label">Note</span>
+      <div class="note-text">${phase.note}</div>
+    </div>` : '';
+  document.getElementById('app').innerHTML = `
+    <a class="back-btn" href="#/">&larr; All phases</a>
+    <div class="phase-label">Phase ${phase.num}</div>
+    <h2 class="detail-title">${phase.title}</h2>
+    <div class="detail-goal">${phase.goal}</div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-pct">${done}/${total}</div>
+    </div>
+    ${note}
+    ${renderItemList(phase, 'study', phase.study, state)}
+    ${renderItemList(phase, 'ask', phase.ask, state)}
+    <a class="reset-link" id="reset-link">Reset this phase</a>
+  `;
+  bindPhaseEvents(phase);
+}
+
+function bindPhaseEvents(phase){
+  document.querySelectorAll('.item-list input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const st = loadState();
+      st[cb.dataset.id] = cb.checked;
+      saveState(st);
+      cb.closest('li').classList.toggle('done', cb.checked);
+      const {done, total} = phaseCounts(phase, st);
+      const pct = total ? Math.round((done/total)*100) : 0;
+      document.querySelector('.progress-fill').style.width = pct + '%';
+      document.querySelector('.progress-pct').textContent = done + '/' + total;
+    });
+  });
+  document.querySelectorAll('.mark-all').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const [num, key] = btn.dataset.mark.split(':');
+      const section = btn.closest('.section');
+      const st = loadState();
+      const boxes = section.querySelectorAll('input[type=checkbox]');
+      const allChecked = Array.from(boxes).every(b => b.checked);
+      boxes.forEach(b => {
+        b.checked = !allChecked;
+        st[b.dataset.id] = !allChecked;
+        b.closest('li').classList.toggle('done', !allChecked);
+      });
+      saveState(st);
+      const {done, total} = phaseCounts(phase, st);
+      const pct = total ? Math.round((done/total)*100) : 0;
+      document.querySelector('.progress-fill').style.width = pct + '%';
+      document.querySelector('.progress-pct').textContent = done + '/' + total;
+    });
+  });
+  const resetLink = document.getElementById('reset-link');
+  if (resetLink) resetLink.addEventListener('click', () => {
+    if (!confirm('Reset progress for this phase?')) return;
+    const st = loadState();
+    allItemIds(phase).forEach(id => delete st[id]);
+    saveState(st);
+    renderPhase(phase.num);
+  });
+}
+
+function router(){
+  const hash = location.hash || '#/';
+  const m = hash.match(/^#\/phase\/(\d+)/);
+  if (m) { renderPhase(m[1]); }
+  else { renderOverview(); }
+  window.scrollTo(0,0);
+}
+
+window.addEventListener('hashchange', router);
+document.addEventListener('DOMContentLoaded', router);
+</script>
+</body>
+</html>
